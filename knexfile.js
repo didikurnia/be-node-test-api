@@ -6,12 +6,13 @@ require('dotenv').config(); // for read .env files
 module.exports = {
 
   development: {
-    client: 'mysql',
+    client: 'mysql2',
     connection: {
-      host : process.env.DB_HOST, //'localhost',
-      user : process.env.DB_USER, // root
-      password : process.env.DB_PASSWORD, // 'db-local-2k23'
-      database : process.env.DB_DATABASE // 'db-node-test',
+      host : process.env.MYSQL_HOST, //'localhost',
+      port : process.env.MYSQL_PORT || 3306, //'localhost',
+      user : process.env.MYSQL_USER || 'root', // root
+      password : process.env.MYSQL_PASSWORD, // 'db-local-2k23'
+      database : process.env.MYSQL_DBNAME // 'db-node-test',
     },
     migrations: {
       directory: __dirname + '/db/schema/migrations'

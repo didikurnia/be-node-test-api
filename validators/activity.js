@@ -1,18 +1,14 @@
-const Joi = require('joi');
+const yup = require('yup');
 
-const joiVaidate = {
-    createActivity: Joi.object({
-        email: Joi.string().email().required(),
-        title: Joi.string()
-            .trim()
-            .required()
-    }).options({ allowUnknown: false }),
+const yupVaidate = {
+    createActivity: yup.object().shape({
+        email: yup.string().required('email required').email(),
+        title: yup.string().required('title cannot be null'),
+    }),
 
-    updateActivity: Joi.object({
-        title: Joi.string()
-            .trim()
-            .required()
-    }).options({ allowUnknown: false })
+    updateActivity: yup.object().shape({
+        title: yup.string().required('title cannot be null'),
+    })
 };
 
-module.exports = joiVaidate;
+module.exports = yupVaidate;

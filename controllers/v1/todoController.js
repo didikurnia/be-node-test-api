@@ -37,8 +37,7 @@ router.get('/:id', async (req, res, next) => {
             .where('todo_id', req.params.id)
             .first() // for returning single value
             .then(data => {
-                console.log(data)
-                res.json({
+                res.status(data ? 200 : 404).json({
                     status: data ? 'Success' : 'Not Found',
                     message: data ? "Success" : `Todo with ID ${ req.params.id } Not Found`,
                     data: data ? data : undefined
@@ -52,8 +51,9 @@ router.get('/:id', async (req, res, next) => {
 /* Create */
 router.post('/', async (req, res, next) => {
     try {
-        const validate = createTodo.validate(req.body);
-        if (validate.error) return errorHandler.UnHandler(res, validate.error); // validation title its been enhanced with Joi Validate
+        const validateData = async (data) => { try { await createTodo.validate(data); } catch (error) { return error.message; }};
+        const result = await validateData(req.body);
+        if (result) { return errorHandler.UnHandler(res, { name: 'yup', message: result })}
 
         db('todos')
             .insert(req.body)
@@ -64,7 +64,7 @@ router.post('/', async (req, res, next) => {
                     .where('todo_id', id[0])
                     .first(); // for returning single value
                 newData.is_active = !!newData.is_active // convert from 1 0 to true false
-                res.json({
+                res.status(201).json({
                     status: 'Success',
                     message: "Success",
                     data: newData
@@ -79,8 +79,9 @@ router.post('/', async (req, res, next) => {
 router.patch('/:id', async (req, res, next) => {
     try {
         delete req.body.status; // i don know for what
-        const validate = updateTodo.validate(req.body);
-        if (validate.error) return errorHandler.UnHandler(res, validate.error); // validation title its been enhanced with Joi Validate
+        const validateData = async (data) => { try { await updateTodo.validate(data); } catch (error) { return error.message; }};
+        const result = await validateData(req.body);
+        if (result) { return errorHandler.UnHandler(res, { name: 'yup', message: result })}
 
         db('todos')
             .update(req.body)
@@ -91,7 +92,7 @@ router.patch('/:id', async (req, res, next) => {
                     .from('todos')
                     .where('todo_id', req.params.id)
                     .first(); // for returning single value
-                res.json({
+                res.status(newData ? 200 : 404).json({
                     status: newData ? 'Success' : 'Not Found',
                     message: newData ? "Success" : `Todo with ID ${ req.params.id } Not Found`,
                     data: newData ? newData : undefined
@@ -109,7 +110,7 @@ router.delete('/:id', async (req, res, next) => {
             .where({ todo_id: req.params.id })
             .del()
             .then((data) => {
-                res.json({
+                res.status(data ? 200 : 404).json({
                     status: data !== 0 ? 'Success' : 'Not Found',
                     message: data !== 0 ? "Success" : `Todo with ID ${ req.params.id } Not Found`,
                     data: data !== 0 ? {} : undefined

@@ -1,17 +1,16 @@
-const Joi = require('joi');
+const yup = require("yup");
 
-const joiVaidate = {
-    createTodo: Joi.object({
-        title: Joi.string().trim().required(),
-        activity_group_id: Joi.number().required(),
-        is_active: Joi.boolean().required(),
-    }).options({ allowUnknown: false }),
+const yupVaidate = {
+    createTodo: yup.object().shape({
+        title: yup.string().required('title cannot be null'),
+    }),
 
-    updateTodo: Joi.object({
-        title: Joi.string().trim().required(),
-        priority: Joi.string().trim().required(),
-        is_active: Joi.boolean().required(),
-    }).options({ allowUnknown: false })
+    updateTodo: yup.object().shape({
+        title: yup.string().required('title cannot be null'),
+        priority: yup.string().required('title cannot be null'),
+        is_active: yup.string().required('title cannot be null'),
+    })
 };
 
-module.exports = joiVaidate;
+module.exports = yupVaidate;
+

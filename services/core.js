@@ -22,7 +22,9 @@ errorHandler.UnHandler = (res, err) => {
         res.status(400).json({ status: 'Bad Request', message: errorMessage });
     } else if (err.code === 'ENOENT') {
         res.status(400).json({ status: 'error', message: err.toString() });
-    } else {
+    } else if (err.name === 'yup') {
+        res.status(400).json({ status: 'Bad Request', message: err.message });
+    }else {
         const message = err.toString() || 'Something technically wrong';
         if (err.kind == 'ObjectId') {
             res.status(400).json({ status: 'error', message });

@@ -35,8 +35,7 @@ router.get('/:id', async (req, res, next) => {
             .where('activity_id', req.params.id)
             .first() // for returning single value
             .then(data => {
-                console.log(data)
-                res.json({
+                res.status(data ? 200 : 404).json({
                     status: data ? 'Success' : 'Not Found',
                     message: data ? "Success" : `Activity with ID ${ req.params.id } Not Found`,
                     data: data ? data : undefined
@@ -50,8 +49,9 @@ router.get('/:id', async (req, res, next) => {
 /* Create */
 router.post('/', async (req, res, next) => {
     try {
-        const validate = createActivity.validate(req.body);
-        if (validate.error) return errorHandler.UnHandler(res, validate.error); // validation title its been enhanced with Joi Validate
+        const validateData = async (data) => { try { await createActivity.validate(data); } catch (error) { return error.message; }};
+        const result = await validateData(req.body);
+        if (result) { return errorHandler.UnHandler(res, { name: 'yup', message: result })}
 
         db('activities')
             .insert(req.body)
@@ -62,7 +62,7 @@ router.post('/', async (req, res, next) => {
                     .where('activity_id', id[0])
                     .first(); // for returning single value
 
-                res.json({
+                res.status(201).json({
                     status: 'Success',
                     message: "Success",
                     data: newData
@@ -76,9 +76,11 @@ router.post('/', async (req, res, next) => {
 /* PATCH */
 router.patch('/:id', async (req, res, next) => {
     try {
-        const validate = updateActivity.validate(req.body);
-        if (validate.error) return errorHandler.UnHandler(res, validate.error); // validation title its been enhanced with Joi Validate
+        const validateData = async (data) => { try { await updateActivity.validate(data); } catch (error) { return error.message; }};
+        const result = await validateData(req.body);
+        if (result) { return errorHandler.UnHandler(res, { name: 'yup', message: result })}
 
+        // execute db
         db('activities')
             .update(req.body)
             .where('activity_id', req.params.id)
@@ -88,7 +90,8 @@ router.patch('/:id', async (req, res, next) => {
                     .from('activities')
                     .where('activity_id', req.params.id)
                     .first(); // for returning single value
-                res.json({
+                // response
+                res.status(newData ? 200 : 404).json({
                     status: newData ? 'Success' : 'Not Found',
                     message: newData ? "Success" : `Activity with ID ${ req.params.id } Not Found`,
                     data: newData ? newData : undefined
@@ -106,10 +109,10 @@ router.delete('/:id', async (req, res, next) => {
             .where({ activity_id: req.params.id })
             .del()
             .then((data) => {
-                res.json({
+                res.status(data ? 200 : 404).json({
                     status: data !== 0 ? 'Success' : 'Not Found',
                     message: data !== 0 ? "Success" : `Activity with ID ${ req.params.id } Not Found`,
-                    data: {}
+                    data: data ? {} : undefined
                 });
         });
     } catch(err) {
