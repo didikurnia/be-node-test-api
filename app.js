@@ -18,61 +18,6 @@ app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
-app.get('/connect-db-mysql', (req, res) => {
-  const mysql = require('mysql')
-  const connection = mysql.createConnection({
-    host: 'db',
-    user: 'root',
-    password: 'db-local-2k23',
-    database: 'db-node-test'
-  })
-
-  connection.connect()
-
-  connection.query('SELECT 1 + 1', (err, rows, fields) => {
-    if (err) throw err
-
-    console.log('The solution is: ', rows)
-  })
-
-  connection.end()
-  res.send('Connect to db')
-});
-
-app.get('/connect-db-knex', (req, res) => {
-  const connConfig = {
-    host : process.env.DB_HOST, //'localhost',
-    user : process.env.DB_USER, // root
-    password : process.env.DB_PASSWORD, // 'db-local-2k23'
-    database : process.env.DB_DATABASE // 'db-node-test',
-    // typeCast: (field, next) => {
-    //     if (field.type === 'DATETIME' || field.type === 'DATE') {
-    //         return moment(field.string()).format()
-    //     }
-    //     return next();
-    // }
-  }
-
-  const db = require('knex')({
-    client: 'mysql',
-    connection: connConfig,
-    useNullAsDefault: true,
-    pool: {
-      min: 2,
-      max: 10,
-    }
-  });
-
-  db.raw("SELECT 1 + 1").then(() => {
-    console.log("connected to db");
-  })
-      .catch((e) => {
-        console.log("db failed to connect or something happen, please check ur db.");
-        console.error(e);
-      });
-  res.send('Connect to db')
-});
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
