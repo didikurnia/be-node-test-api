@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  nodejs:
+#    container_name: 'devcode-unit-test-1'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devcode-unit-test-1:latest
+    ports:
+      - "8080:80"
+    stdin_open: true
+    environment:
+#      NODE_ENV: production
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: db-local-2k23
+      DB_DATABASE: db-node-test
+    networks:
+      - my-network
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  db: # set as host
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: db-local-2k23
+      MYSQL_DATABASE: db-node-test
+#      MYSQL_USER: node-test
+#      MYSQL_PASSWORD: db-local-2k23-client
+    networks:
+      - my-network
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - ./data:/var/lib/mysql
+
+networks:
+  my-network:
+    driver: bridge

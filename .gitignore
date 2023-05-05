@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# SQL Server files
+*.mdf
+*.ldf
+data
+
+# idea
+.idea/be-node-test-api.iml

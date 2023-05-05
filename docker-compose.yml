@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done && knex migrate:latest && npm start'
+    ports:
+      - "3030:3030"
+    environment:
+#      PORT: 8080
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: db-local-2k23
+      DB_DATABASE: db-node-test
+  db:
+    container_name: db # host or serve name
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: db-local-2k23
+      MYSQL_DATABASE: db-node-test
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
